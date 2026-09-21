@@ -1,0 +1,20 @@
+name: 同步对比指数
+
+on:
+  schedule:
+    # GitHub 用 UTC 时间：09:30 UTC = 北京时间 17:30（收盘后中证官网已更新）
+    - cron: '30 9 * * 1-5'
+    # 13:00 UTC = 北京时间 21:00，再跑一次兜底
+    - cron: '0 13 * * 1-5'
+  workflow_dispatch:   # 允许在 Actions 页面手动运行
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 拉取指数并写入 Gist
+        run: python3 scripts/sync_bench.py
+        env:
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: ${{ secrets.GIST_ID }}
